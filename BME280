@@ -1,0 +1,43 @@
+#include <Wire.h>                 // Librería para comunicación I2C
+#include <Adafruit_Sensor.h>     // Librería base para sensores Adafruit
+#include <Adafruit_BME280.h>     // Librería específica para el BME280
+
+// Definir pines SDA y SCL personalizados para I2C
+#define SDA_PIN 9
+#define SCL_PIN 8
+
+Adafruit_BME280 bme;  // Crear el objeto del sensor BME280
+
+void setup() {
+  Serial.begin(115200);                    // Iniciar comunicación serial a 115200 baudios
+  Wire.begin(SDA_PIN, SCL_PIN);           // Iniciar I2C en pines personalizados
+
+  // Intenta iniciar el sensor 
+  bool status = bme.begin(0x76);          
+
+  if (!status) {
+    Serial.println("No se detectóal sensor.");
+    while (1);  // Detener el programa si no se detecta el sensor
+  }
+
+  Serial.println("El sensor inicio correctamente.");
+}
+
+void loop() {
+  // Mostrar temperatura
+  Serial.print("Temperatura: ");
+  Serial.print(bme.readTemperature());  // Leer temperatura en °C
+  Serial.print(" °C\t");
+
+  // Mostrar humedad relativa
+  Serial.print("Humedad: ");
+  Serial.print(bme.readHumidity());    // Leer humedad en %
+  Serial.print(" %\t");
+
+  // Mostrar presión atmosférica
+  Serial.print("Presión: ");
+  Serial.print(bme.readPressure() / 100.0F);  // Convertir de Pa a hPa
+  Serial.println(" hPa");
+
+  delay(5000);  // Esperar 5 segundos entre lecturas
+}
