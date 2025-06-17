@@ -1,0 +1,47 @@
+#include <Wire.h>                    // Librería para comunicación I2C
+#include <Adafruit_BMP085_U.h>      // Librería para sensores BMP180 
+
+// Crear objeto del sensor BMP180 
+Adafruit_BMP085_Unified bmp = Adafruit_BMP085_Unified(10085);
+
+void setup() {
+  Serial.begin(115200);             // Inicia la comunicación serial a 115200 baudios
+
+  // Inicializa la comunicación I2C usando pines personalizados SDA = 9 y SCL = 8
+  Wire.begin(9, 8);
+
+  Serial.println("Buscando sensor BMP180...");
+
+  // Inicializa el sensor BMP180 sin necesidad de pasar el objeto Wire
+  if (!bmp.begin()) {
+    Serial.println("ERROR: No se encontró el BMP180.");
+    while (1) delay(100);  // Se inicia un bucle infinito si el sensor no es detectado
+  }
+
+  Serial.println("Sensor BMP180 listo.");
+}
+
+void loop() {
+  sensors_event_t event;           // Estructura para guardar datos del sensor
+
+  // Obtener la lectura de presión atmosférica
+  bmp.getEvent(&event);
+
+  if (event.pressure) {
+    Serial.print("Presión: ");
+    Serial.print(event.pressure);  // La presión ya viene en hPa (hectopascales)
+    Serial.println(" hPa");
+  } else {
+    Serial.println("No se pudo leer la presión.");
+  }
+
+  // Obtener lectura de temperatura
+  float temperature;
+  bmp.getTemperature(&temperature);  // Lee la temperatura en °C
+  Serial.print("Temperatura: ");
+  Serial.print(temperature);
+  Serial.println(" °C");
+
+  Serial.println(" ");  // Línea en blanco como separador visual
+  delay(3000);          // Espera 3 segundos entre cada lectura
+}
